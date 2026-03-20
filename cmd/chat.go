@@ -39,7 +39,7 @@ func chatLoop(ctx context.Context, client api.ZoClient, model, persona string, i
 	scanner := bufio.NewScanner(in)
 	var conversationID string
 
-	fmt.Fprintln(out, "Zo Chat — type 'exit' or 'quit' to end")
+	fmt.Fprintln(out, "zo-cli Chat — type 'exit' or 'quit' to end")
 	fmt.Fprintln(out, "")
 
 	for {
@@ -74,10 +74,10 @@ func chatLoop(ctx context.Context, client api.ZoClient, model, persona string, i
 		// Print response
 		var strOutput string
 		if json.Unmarshal(resp.Output, &strOutput) == nil {
-			fmt.Fprintf(out, "zo> %s\n\n", strOutput)
+			fmt.Fprintf(out, "zo-cli> %s\n\n",strOutput)
 		} else {
 			formatted, _ := json.MarshalIndent(resp.Output, "", "  ")
-			fmt.Fprintf(out, "zo> %s\n\n", string(formatted))
+			fmt.Fprintf(out, "zo-cli> %s\n\n",string(formatted))
 		}
 
 		// Track conversation

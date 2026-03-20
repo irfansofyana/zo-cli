@@ -12,6 +12,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestChatLoop_PromptPrefix(t *testing.T) {
+	mock := &mockClient{
+		askFunc: func(ctx context.Context, req api.AskRequest) (*api.AskResponse, error) {
+			output, _ := json.Marshal("hello back")
+			return &api.AskResponse{Output: output}, nil
+		},
+	}
+
+	input := "hi\nexit\n"
+	out := new(bytes.Buffer)
+	err := chatLoop(context.Background(), mock, "", "", strings.NewReader(input), out)
+	require.NoError(t, err)
+	assert.Contains(t, out.String(), "zo-cli>")
+}
+
 func TestChatLoop_BasicConversation(t *testing.T) {
 	callCount := 0
 	mock := &mockClient{

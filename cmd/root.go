@@ -17,7 +17,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:           "zo",
+	Use:           "zo-cli",
 	Short:         "Zo CLI - interact with the Zo Computer API",
 	Long:          "A command-line tool for chatting with Zo, listing models, and managing personas.",
 	SilenceUsage:  true,
@@ -54,7 +54,7 @@ func defaultClientFactory() (api.ZoClient, error) {
 // requireAPIKey returns an error if no API key is configured.
 func requireAPIKey() error {
 	if resolveAPIKey() == "" {
-		return fmt.Errorf("no API key configured; run 'zo config set-key' or set ZO_API_KEY")
+		return fmt.Errorf("no API key configured; run 'zo-cli config set-key' or set ZO_API_KEY")
 	}
 	return nil
 }
