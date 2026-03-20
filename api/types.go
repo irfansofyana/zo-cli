@@ -10,6 +10,7 @@ type AskRequest struct {
 	ModelName      string           `json:"model_name,omitempty"`
 	PersonaID      string           `json:"persona_id,omitempty"`
 	OutputFormat   *json.RawMessage `json:"output_format,omitempty"`
+	Stream         bool             `json:"stream"`
 }
 
 type AskResponse struct {
