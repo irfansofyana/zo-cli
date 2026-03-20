@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -24,8 +23,6 @@ func TestAsk_Success(t *testing.T) {
 		var req AskRequest
 		require.NoError(t, json.Unmarshal(body, &req))
 		assert.Equal(t, "hello", req.Input)
-		assert.False(t, req.Stream)
-
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"output":          "Hi there!",
@@ -135,52 +132,6 @@ func TestListPersonas_Success(t *testing.T) {
 	assert.Len(t, resp.Personas, 2)
 	assert.Equal(t, "p1", resp.Personas[0].ID)
 	assert.Equal(t, "Default", resp.Personas[0].Name)
-}
-
-func TestAskStream_Success(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, _ := io.ReadAll(r.Body)
-		var req AskRequest
-		require.NoError(t, json.Unmarshal(body, &req))
-		assert.True(t, req.Stream)
-
-		w.Header().Set("Content-Type", "text/event-stream")
-		w.WriteHeader(http.StatusOK)
-		flusher := w.(http.Flusher)
-		fmt.Fprintln(w, "data: chunk1")
-		flusher.Flush()
-		fmt.Fprintln(w, "data: chunk2")
-		flusher.Flush()
-		fmt.Fprintln(w, "data: [DONE]")
-		flusher.Flush()
-	}))
-	defer server.Close()
-
-	client := NewHTTPClient(server.URL, "test-key")
-	var chunks []string
-	err := client.AskStream(context.Background(), AskRequest{Input: "hello"}, func(chunk string) error {
-		chunks = append(chunks, chunk)
-		return nil
-	})
-	require.NoError(t, err)
-	assert.Equal(t, []string{"chunk1", "chunk2"}, chunks)
-}
-
-func TestAskStream_APIError(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"error": "unauthorized"})
-	}))
-	defer server.Close()
-
-	client := NewHTTPClient(server.URL, "bad-key")
-	err := client.AskStream(context.Background(), AskRequest{Input: "hello"}, func(chunk string) error {
-		return nil
-	})
-	require.Error(t, err)
-	apiErr, ok := err.(*APIError)
-	require.True(t, ok)
-	assert.Equal(t, http.StatusUnauthorized, apiErr.StatusCode)
 }
 
 func TestNewHTTPClient_DefaultBaseURL(t *testing.T) {

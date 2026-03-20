@@ -57,9 +57,6 @@ zo ask --conversation-id "conv-abc123" "Tell me more"
 # Use a specific persona
 zo ask --persona "coder" "Write a fizzbuzz in Go"
 
-# Enable streaming output
-zo ask --stream "Write a short story"
-
 # Structured output via JSON schema file
 zo ask --output-format schema.json "List 3 colors"
 ```
@@ -106,8 +103,7 @@ zo-cli/
 ├── main.go              # Entry point
 ├── api/
 │   ├── client.go        # ZoClient interface and HTTP implementation
-│   ├── types.go         # Request/response types
-│   └── stream.go        # SSE stream reader
+│   └── types.go         # Request/response types
 ├── cmd/
 │   ├── root.go          # Root command, global flags, API key resolution
 │   ├── ask.go           # zo ask
@@ -131,6 +127,10 @@ go build -o zo .
 # Vet
 go vet ./...
 ```
+
+## Backlog
+
+- **Streaming support (`--stream`)**: Add SSE streaming for `zo ask`. The Zo API's streaming response uses typed SSE events (e.g. `FrontendModelResponse`, `End`) with JSON `data:` payloads containing a `content` field. A proper implementation needs to: parse `event:` lines to distinguish content from control events, decode JSON from `data:` lines and extract the `.content` text, handle end-of-stream events (which carry metadata like `conversation_id`), and suppress non-content payloads from terminal output.
 
 ## License
 

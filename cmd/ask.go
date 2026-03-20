@@ -15,7 +15,6 @@ var (
 	askConversationID string
 	askPersona        string
 	askOutputFormat   string
-	askStream         bool
 )
 
 var askCmd = &cobra.Command{
@@ -43,15 +42,6 @@ var askCmd = &cobra.Command{
 			}
 			raw := json.RawMessage(data)
 			req.OutputFormat = &raw
-		}
-
-		if askStream {
-			err := client.AskStream(cmd.Context(), req, func(chunk string) error {
-				fmt.Print(chunk)
-				return nil
-			})
-			fmt.Println()
-			return err
 		}
 
 		resp, err := client.Ask(cmd.Context(), req)
@@ -86,6 +76,5 @@ func init() {
 	askCmd.Flags().StringVar(&askConversationID, "conversation-id", "", "Continue an existing conversation")
 	askCmd.Flags().StringVar(&askPersona, "persona", "", "Override the active persona")
 	askCmd.Flags().StringVar(&askOutputFormat, "output-format", "", "Path to JSON schema file for structured output")
-	askCmd.Flags().BoolVar(&askStream, "stream", false, "Enable streaming mode")
 	rootCmd.AddCommand(askCmd)
 }

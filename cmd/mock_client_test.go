@@ -8,10 +8,9 @@ import (
 
 // mockClient implements api.ZoClient for testing.
 type mockClient struct {
-	askFunc      func(ctx context.Context, req api.AskRequest) (*api.AskResponse, error)
-	askStreamFn  func(ctx context.Context, req api.AskRequest, handler func(chunk string) error) error
-	modelsFn     func(ctx context.Context) (*api.ModelsResponse, error)
-	personasFn   func(ctx context.Context) (*api.PersonasResponse, error)
+	askFunc    func(ctx context.Context, req api.AskRequest) (*api.AskResponse, error)
+	modelsFn   func(ctx context.Context) (*api.ModelsResponse, error)
+	personasFn func(ctx context.Context) (*api.PersonasResponse, error)
 }
 
 func (m *mockClient) Ask(ctx context.Context, req api.AskRequest) (*api.AskResponse, error) {
@@ -19,13 +18,6 @@ func (m *mockClient) Ask(ctx context.Context, req api.AskRequest) (*api.AskRespo
 		return m.askFunc(ctx, req)
 	}
 	return nil, nil
-}
-
-func (m *mockClient) AskStream(ctx context.Context, req api.AskRequest, handler func(chunk string) error) error {
-	if m.askStreamFn != nil {
-		return m.askStreamFn(ctx, req, handler)
-	}
-	return nil
 }
 
 func (m *mockClient) ListModels(ctx context.Context) (*api.ModelsResponse, error) {

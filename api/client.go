@@ -14,7 +14,6 @@ const DefaultBaseURL = "https://api.zo.computer"
 // ZoClient is the interface all commands depend on.
 type ZoClient interface {
 	Ask(ctx context.Context, req AskRequest) (*AskResponse, error)
-	AskStream(ctx context.Context, req AskRequest, handler func(chunk string) error) error
 	ListModels(ctx context.Context) (*ModelsResponse, error)
 	ListPersonas(ctx context.Context) (*PersonasResponse, error)
 }
@@ -38,7 +37,6 @@ func NewHTTPClient(baseURL, apiKey string) *HTTPClient {
 }
 
 func (c *HTTPClient) Ask(ctx context.Context, req AskRequest) (*AskResponse, error) {
-	req.Stream = false
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
@@ -74,37 +72,6 @@ func (c *HTTPClient) Ask(ctx context.Context, req AskRequest) (*AskResponse, err
 		return nil, fmt.Errorf("unmarshal response: %w", err)
 	}
 	return &askResp, nil
-}
-
-func (c *HTTPClient) AskStream(ctx context.Context, req AskRequest, handler func(chunk string) error) error {
-	req.Stream = true
-	body, err := json.Marshal(req)
-	if err != nil {
-		return fmt.Errorf("marshal request: %w", err)
-	}
-
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+"/zo/ask", bytes.NewReader(body))
-	if err != nil {
-		return fmt.Errorf("create request: %w", err)
-	}
-	c.setHeaders(httpReq)
-
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return fmt.Errorf("send request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		respBody, _ := io.ReadAll(resp.Body)
-		var errResp ErrorResponse
-		if json.Unmarshal(respBody, &errResp) == nil && errResp.Error != "" {
-			return &APIError{StatusCode: resp.StatusCode, Message: errResp.Error}
-		}
-		return &APIError{StatusCode: resp.StatusCode, Message: fmt.Sprintf("unexpected status %d: %s", resp.StatusCode, string(respBody))}
-	}
-
-	return ReadSSE(resp.Body, handler)
 }
 
 func (c *HTTPClient) ListModels(ctx context.Context) (*ModelsResponse, error) {
