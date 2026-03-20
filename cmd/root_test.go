@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,10 +30,12 @@ func TestRootCmd_UseName(t *testing.T) {
 }
 
 func TestRequireAPIKey_ErrorMentionsZoCli(t *testing.T) {
-	// Save and clear the API key flag
 	orig := apiKeyFlag
 	apiKeyFlag = ""
 	defer func() { apiKeyFlag = orig }()
+
+	t.Setenv("ZO_API_KEY", "")
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(t.TempDir(), "empty"))
 
 	err := requireAPIKey()
 	assert.Error(t, err)
