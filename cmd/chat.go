@@ -23,6 +23,10 @@ var chatCmd = &cobra.Command{
 	Short: "Start an interactive conversation with Zo",
 	Long:  "Enter a REPL loop where you can chat continuously with Zo. Conversation context is maintained automatically. Type 'exit' or 'quit' to end.",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := requireAPIKey(); err != nil {
+			return err
+		}
+
 		client, err := getClient()
 		if err != nil {
 			return err

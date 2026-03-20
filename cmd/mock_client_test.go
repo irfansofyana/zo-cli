@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"os"
 
 	"github.com/irfansofyana/zo-cli/api"
 )
@@ -35,10 +36,16 @@ func (m *mockClient) ListPersonas(ctx context.Context) (*api.PersonasResponse, e
 }
 
 // setMockClient replaces the client factory for testing and returns a cleanup function.
+// It also sets ZO_API_KEY so that requireAPIKey() passes.
 func setMockClient(mock *mockClient) func() {
 	old := clientFactory
 	clientFactory = func() (api.ZoClient, error) {
 		return mock, nil
 	}
-	return func() { clientFactory = old }
+	prevKey := os.Getenv("ZO_API_KEY")
+	os.Setenv("ZO_API_KEY", "test-key")
+	return func() {
+		clientFactory = old
+		os.Setenv("ZO_API_KEY", prevKey)
+	}
 }

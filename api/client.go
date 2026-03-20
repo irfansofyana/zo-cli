@@ -124,5 +124,7 @@ func (c *HTTPClient) doGet(ctx context.Context, path string, out interface{}) er
 
 func (c *HTTPClient) setHeaders(req *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	if c.apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	}
 }

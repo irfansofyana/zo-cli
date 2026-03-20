@@ -23,6 +23,10 @@ var askCmd = &cobra.Command{
 	Long:  "Send a single message to Zo and get a response. Use --conversation-id to continue a conversation.",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := requireAPIKey(); err != nil {
+			return err
+		}
+
 		client, err := getClient()
 		if err != nil {
 			return err

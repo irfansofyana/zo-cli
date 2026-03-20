@@ -41,9 +41,6 @@ func getClient() (api.ZoClient, error) {
 
 func defaultClientFactory() (api.ZoClient, error) {
 	key := resolveAPIKey()
-	if key == "" {
-		return nil, fmt.Errorf("no API key configured; run 'zo config set-key' or set ZO_API_KEY")
-	}
 
 	cfg, _ := config.Load()
 	baseURL := ""
@@ -52,6 +49,14 @@ func defaultClientFactory() (api.ZoClient, error) {
 	}
 
 	return api.NewHTTPClient(baseURL, key), nil
+}
+
+// requireAPIKey returns an error if no API key is configured.
+func requireAPIKey() error {
+	if resolveAPIKey() == "" {
+		return fmt.Errorf("no API key configured; run 'zo config set-key' or set ZO_API_KEY")
+	}
+	return nil
 }
 
 func resolveAPIKey() string {
