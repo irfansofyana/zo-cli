@@ -1,6 +1,6 @@
 # zo-cli
 
-A command-line tool for interacting with the [Zo Computer API](https://api.zo.computer).
+A command-line tool for interacting with the [Zo Computer API](https://docs.zocomputer.com/api).
 
 ## Installation
 
