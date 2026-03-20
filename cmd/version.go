@@ -1,17 +1,10 @@
 package cmd
 
-import (
-	"fmt"
-	"runtime/debug"
-
-	"github.com/spf13/cobra"
-)
+import "runtime/debug"
 
 // Version is the current CLI version.
-// Priority (highest to lowest):
-//  1. Set via -ldflags at build time (e.g. goreleaser / custom Makefile)
-//  2. Embedded by the Go toolchain when installed via `go install module@version`
-//  3. Falls back to "dev" for local builds with no version info
+// Set via -ldflags at build time, or read from build info when
+// installed via `go install module@version`. Falls back to "dev".
 var Version = "dev"
 
 func init() {
@@ -21,13 +14,4 @@ func init() {
 		}
 	}
 	rootCmd.Version = Version
-	rootCmd.AddCommand(versionCmd)
-}
-
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version of zo",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Fprintln(cmd.OutOrStdout(), Version)
-	},
 }
