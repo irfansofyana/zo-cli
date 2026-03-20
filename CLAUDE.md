@@ -6,13 +6,13 @@
 
 ## Build & test commands
 
-- Build: `go build -o zo .`
+- Build: `go build -o zo ./zo`
 - Test: `go test ./...`
 - Vet: `go vet ./...`
 
 ## Project structure
 
-- `main.go` — entry point
+- `zo/main.go` — entry point
 - `api/` — HTTP client, request/response types
 - `cmd/` — cobra commands (ask, chat, models, personas, config)
 - `config/` — config file load/save
