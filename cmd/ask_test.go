@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/irfansofyana/zo-cli/api"
@@ -100,4 +102,59 @@ func TestAskCmd_StructuredOutput(t *testing.T) {
 	err := rootCmd.Execute()
 	require.NoError(t, err)
 	assert.Contains(t, buf.String(), "Zo")
+}
+
+func TestAskCmd_OutputFormatSendsSchema(t *testing.T) {
+	schema := `{"type":"object","properties":{"name":{"type":"string"}}}`
+	schemaFile := filepath.Join(t.TempDir(), "schema.json")
+	require.NoError(t, os.WriteFile(schemaFile, []byte(schema), 0644))
+
+	mock := &mockClient{
+		askFunc: func(ctx context.Context, req api.AskRequest) (*api.AskResponse, error) {
+			require.NotNil(t, req.OutputFormat, "OutputFormat should be set")
+			var parsed map[string]interface{}
+			require.NoError(t, json.Unmarshal(*req.OutputFormat, &parsed))
+			assert.Equal(t, "object", parsed["type"])
+			output, _ := json.Marshal(map[string]string{"name": "Zo"})
+			return &api.AskResponse{Output: output}, nil
+		},
+	}
+	cleanup := setMockClient(mock)
+	defer cleanup()
+
+	buf := new(bytes.Buffer)
+	rootCmd.SetOut(buf)
+	rootCmd.SetArgs([]string{"ask", "--output-format", schemaFile, "test"})
+	err := rootCmd.Execute()
+	require.NoError(t, err)
+	assert.Contains(t, buf.String(), "Zo")
+}
+
+func TestAskCmd_OutputFormatInvalidFile(t *testing.T) {
+	cleanup := setMockClient(&mockClient{})
+	defer cleanup()
+
+	rootCmd.SetArgs([]string{"ask", "--output-format", "/nonexistent/schema.json", "test"})
+	err := rootCmd.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "read output format file")
+}
+
+func TestAskCmd_OutputFormatOmittedWhenNotSet(t *testing.T) {
+	askOutputFormat = "" // reset from prior tests
+	mock := &mockClient{
+		askFunc: func(ctx context.Context, req api.AskRequest) (*api.AskResponse, error) {
+			assert.Nil(t, req.OutputFormat, "OutputFormat should be nil when flag is not set")
+			output, _ := json.Marshal("ok")
+			return &api.AskResponse{Output: output}, nil
+		},
+	}
+	cleanup := setMockClient(mock)
+	defer cleanup()
+
+	buf := new(bytes.Buffer)
+	rootCmd.SetOut(buf)
+	rootCmd.SetArgs([]string{"ask", "test"})
+	err := rootCmd.Execute()
+	require.NoError(t, err)
 }
