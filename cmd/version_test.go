@@ -27,3 +27,9 @@ func TestVersionCmd_PrintsVersion(t *testing.T) {
 func TestRootCmd_HasVersion(t *testing.T) {
 	assert.NotEmpty(t, rootCmd.Version)
 }
+
+func TestVersion_NeverEmpty(t *testing.T) {
+	// Version must always be non-empty: either injected via ldflags,
+	// read from build info (go install @version), or the "dev" fallback.
+	assert.NotEmpty(t, Version)
+}
