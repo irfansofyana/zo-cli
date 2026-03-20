@@ -16,6 +16,7 @@ func TestRootCmd_HasSubcommands(t *testing.T) {
 	assert.Contains(t, names, "models")
 	assert.Contains(t, names, "personas")
 	assert.Contains(t, names, "config")
+	assert.Contains(t, names, "help")
 }
 
 func TestRootCmd_HasAPIKeyFlag(t *testing.T) {
