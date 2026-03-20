@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/irfansofyana/zo-cli/api"
+	"github.com/irfansofyana/zo-cli/internal/api"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/irfansofyana/zo-cli/api"
+	"github.com/irfansofyana/zo-cli/internal/api"
 	"github.com/spf13/cobra"
 )
 

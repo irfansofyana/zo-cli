@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/irfansofyana/zo-cli/api"
-	"github.com/irfansofyana/zo-cli/config"
+	"github.com/irfansofyana/zo-cli/internal/api"
+	"github.com/irfansofyana/zo-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 

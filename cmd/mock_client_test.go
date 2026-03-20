@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/irfansofyana/zo-cli/api"
+	"github.com/irfansofyana/zo-cli/internal/api"
 )
 
 // mockClient implements api.ZoClient for testing.
