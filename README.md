@@ -130,7 +130,7 @@ go vet ./...
 
 ## Backlog
 
-- **Streaming support (`--stream`)**: Add SSE streaming for `zo-cli ask`. The Zo API's streaming response uses typed SSE events (e.g. `FrontendModelResponse`, `End`) with JSON `data:` payloads containing a `content` field. A proper implementation needs to: parse `event:` lines to distinguish content from control events, decode JSON from `data:` lines and extract the `.content` text, handle end-of-stream events (which carry metadata like `conversation_id`), and suppress non-content payloads from terminal output.
+- **Streaming support (`--stream`)**: Add SSE streaming for `zo-cli ask`.
 
 ## License
 
